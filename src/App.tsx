@@ -6,7 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import Home from "./pages/Home";
 import Topics from "./pages/Topics";
-import Simulator from "./pages/Simulator";
+import TopicDetail from "./pages/TopicDetail";
 import Quiz from "./pages/Quiz";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
@@ -23,7 +23,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/topics" element={<Topics />} />
-          <Route path="/simulator" element={<Simulator />} />
+          <Route path="/topics/:topicId" element={<TopicDetail />} />
           <Route path="/quiz" element={<Quiz />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="*" element={<NotFound />} />
