@@ -68,10 +68,10 @@ export default function Home() {
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
             </Link>
-            <Link to="/simulator">
+            <Link to="/quiz">
               <Button size="lg" variant="outline" className="neon-border">
-                <Cpu className="mr-2 w-5 h-5" />
-                Try Simulator
+                <Trophy className="mr-2 w-5 h-5" />
+                Practice Quizzes
               </Button>
             </Link>
           </div>
@@ -140,15 +140,15 @@ export default function Home() {
               </Card>
             </Link>
 
-            <Link to="/simulator" className="group">
+            <Link to="/dashboard" className="group">
               <Card className="p-8 gradient-card border-border/50 hover:border-secondary/50 transition-all duration-300 hover:scale-105 h-full">
-                <Cpu className="w-12 h-12 text-secondary mb-4 group-hover:animate-pulse-glow" />
-                <h3 className="text-2xl font-bold mb-2">Build Circuits</h3>
+                <Target className="w-12 h-12 text-secondary mb-4 group-hover:animate-pulse-glow" />
+                <h3 className="text-2xl font-bold mb-2">Track Progress</h3>
                 <p className="text-muted-foreground mb-4">
-                  Create and test digital circuits with our interactive simulator
+                  Monitor your learning journey and earn achievement badges
                 </p>
                 <span className="text-secondary font-medium inline-flex items-center">
-                  Open Simulator <ArrowRight className="ml-2 w-4 h-4" />
+                  View Dashboard <ArrowRight className="ml-2 w-4 h-4" />
                 </span>
               </Card>
             </Link>
