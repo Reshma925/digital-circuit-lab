@@ -1,14 +1,27 @@
-import { Topic } from './topicsData';
+import { Topic } from "./topicsData";
 
 export const booleanAlgebraTopic: Topic = {
   id: "boolean-algebra",
   title: "Boolean Algebra",
   description: "Laws, theorems, De Morgan's laws, SOP & POS forms",
   color: "from-purple-500 to-pink-500",
+
   lessons: [
     {
       id: "boolean-basics",
       title: "Boolean Variables and Operations",
+
+      // Interactive gates for Lesson 1
+      truthTables: [
+        { type: "AND", inputs: 2 },
+        { type: "OR", inputs: 2 },
+        { type: "NOT", inputs: 1 },
+        { type: "NAND", inputs: 2 },
+        { type: "NOR", inputs: 2 },
+        { type: "XOR", inputs: 2 },
+        { type: "XNOR", inputs: 2 }
+      ],
+
       content: `
 # Boolean Algebra Fundamentals
 
@@ -18,8 +31,8 @@ Boolean algebra is the mathematics of **logic**. It works with only **two values
 ## Basic Operations
 
 ### 1. AND Operation (·)
-Symbol: A · B or AB
-Truth: Output is 1 ONLY when ALL inputs are 1
+Symbol: A · B or AB  
+Truth: Output is 1 ONLY when ALL inputs are 1  
 
 | A | B | A·B |
 |---|---|-----|
@@ -31,8 +44,8 @@ Truth: Output is 1 ONLY when ALL inputs are 1
 **Example**: Switch circuit in series
 
 ### 2. OR Operation (+)
-Symbol: A + B
-Truth: Output is 1 when ANY input is 1
+Symbol: A + B  
+Truth: Output is 1 when ANY input is 1  
 
 | A | B | A+B |
 |---|---|-----|
@@ -44,8 +57,8 @@ Truth: Output is 1 when ANY input is 1
 **Example**: Switch circuit in parallel
 
 ### 3. NOT Operation (')
-Symbol: A' or Ā
-Truth: Output is opposite of input
+Symbol: A' or Ā  
+Truth: Output is opposite of input  
 
 | A | A' |
 |---|----|
@@ -55,45 +68,63 @@ Truth: Output is opposite of input
 **Example**: Inverter switch
 
 ## Boolean Constants
-- **0**: Always FALSE (Ground, OFF)
-- **1**: Always TRUE (Power, ON)
+- **0** = FALSE  
+- **1** = TRUE  
 
 ## Boolean Variables
-Letters (A, B, C, X, Y, Z) that can be either 0 or 1.
+Letters like A, B, C, X, Y, Z
 
 ## Order of Operations
-1. NOT (')
-2. AND (·)
-3. OR (+)
+1. NOT  
+2. AND  
+3. OR
 
 **Example**: A + B·C' means A + (B·(C'))
       `,
-      notes: "Boolean algebra is the foundation of all digital circuits. Every computer operation boils down to AND, OR, NOT!",
-      memoryTrick: "**AND**: Think '**All must be 1**'\n**OR**: Think '**One is enough**'\n**NOT**: Think '**Opposite**'",
-      formula: "AND: A·B\nOR: A+B\nNOT: A'",
-      examTip: "Always use proper notation: · for AND, + for OR, ' for NOT. Draw truth tables for clarity!",
+
+      notes:
+        "Boolean algebra is the foundation of all digital circuits. Every computer operation boils down to AND, OR, NOT!",
+      memoryTrick:
+        "**AND**: All must be 1\n**OR**: One is enough\n**NOT**: Opposite",
+      formula: "AND = A·B\nOR = A+B\nNOT = A'",
+      examTip:
+        "Use proper notation. Draw truth tables to avoid mistakes. Always expand expressions carefully.",
       practice: [
         {
           id: "q1",
           question: "What is the output of 1 · 0?",
           options: ["0", "1", "Undefined", "Both"],
           correctAnswer: 0,
-          hint: "AND operation: both must be 1 for output to be 1",
-          explanation: "1 · 0 = 0. In AND operation, if any input is 0, output is 0."
+          hint: "AND → both must be 1",
+          explanation: "1 · 0 = 0 because AND only outputs 1 when ALL inputs are 1."
         },
         {
           id: "q2",
           question: "If A=1 and B=0, what is A + B?",
           options: ["0", "1", "A", "B"],
           correctAnswer: 1,
-          hint: "OR operation: output is 1 if any input is 1",
-          explanation: "A + B = 1 + 0 = 1. OR gives 1 when at least one input is 1."
+          hint: "OR → at least one input must be 1",
+          explanation: "1 + 0 = 1 because OR outputs 1 if ANY input is 1."
         }
       ]
     },
+
+    // ---------- Lesson 2: Boolean Laws and Theorems ----------
     {
       id: "boolean-laws",
       title: "Boolean Laws and Theorems",
+
+      // Interactive gates for Lesson 2 (added)
+      truthTables: [
+        { type: "AND", inputs: 2 },
+        { type: "OR", inputs: 2 },
+        { type: "NOT", inputs: 1 },
+        { type: "NAND", inputs: 2 },
+        { type: "NOR", inputs: 2 },
+        { type: "XOR", inputs: 2 },
+        { type: "XNOR", inputs: 2 }
+      ],
+
       content: `
 # Boolean Laws and Theorems
 
@@ -141,10 +172,12 @@ Letters (A, B, C, X, Y, Z) that can be either 0 or 1.
 = A + 0         [Complement law]
 = A             [Identity law]
       `,
-      notes: "These laws are your tools for simplifying expressions. Master De Morgan's - it's asked in every exam!",
-      memoryTrick: "**DE MORGAN**: '**Break the line, Change the sign**' - Break the overbar, change AND↔OR!",
+      notes:
+        "These laws are your tools for simplifying expressions. Master De Morgan's - it's asked in every exam!",
+      memoryTrick:
+        "**DE MORGAN**: '**Break the line, Change the sign**' - Break the overbar, change AND↔OR!",
       formula: "(A+B)' = A'·B'\n(A·B)' = A'+B'",
-      examTip: "Write the law name when simplifying! Example: 'Using Complement Law: A·A'=0'. Examiners love this!",
+      examTip: "Write law name when simplifying! Example: 'Using Complement Law: A·A'=0'. Examiners love this!",
       practice: [
         {
           id: "q1",
@@ -164,9 +197,23 @@ Letters (A, B, C, X, Y, Z) that can be either 0 or 1.
         }
       ]
     },
+
+    // ---------- Lesson 3: SOP and POS ----------
     {
       id: "sop-pos",
       title: "SOP and POS Forms",
+
+      // Interactive gates for Lesson 3 (added)
+      truthTables: [
+        { type: "AND", inputs: 2 },
+        { type: "OR", inputs: 2 },
+        { type: "NOT", inputs: 1 },
+        { type: "NAND", inputs: 2 },
+        { type: "NOR", inputs: 2 },
+        { type: "XOR", inputs: 2 },
+        { type: "XNOR", inputs: 2 }
+      ],
+
       content: `
 # Sum of Products (SOP) and Product of Sums (POS)
 
@@ -191,10 +238,6 @@ Letters (A, B, C, X, Y, Z) that can be either 0 or 1.
 - Product (·) of sum (+) terms
 - Each sum term is called a **maxterm**
 - Also called **Conjunctive Normal Form (CNF)**
-
-### Example: F = (A+B)·(A'+C)
-- Sums: A+B and A'+C
-- Product: Combined with AND (·)
 
 ## Minterms and Maxterms
 
@@ -251,6 +294,7 @@ Any Boolean function can be expressed in both forms!
       ]
     }
   ],
+
   quizQuestions: [
     {
       id: "q1",
