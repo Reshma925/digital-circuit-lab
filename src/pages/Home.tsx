@@ -1,3 +1,4 @@
+// src/Home.tsx
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -56,20 +57,23 @@ export default function Home() {
           <p className="text-xl md:text-2xl text-muted-foreground mb-4">
             Learn by Doing
           </p>
-          <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
+          <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed">
             Master logic gates, boolean algebra, and digital circuits through interactive simulations, 
             animations, and hands-on practice designed for Class 11 & 12 students.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
             <Link to="/topics">
-              <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg hover:shadow-primary/50 transition-all">
-                Start Learning
-                <ArrowRight className="ml-2 w-5 h-5" />
+              <Button
+                size="lg"
+                className="inline-flex items-center gap-2 justify-center bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg hover:shadow-primary/50 transition-all text-base font-medium"
+              >
+                <span>Start Learning</span>
+                <ArrowRight className="w-5 h-5" />
               </Button>
             </Link>
             <Link to="/quiz">
-              <Button size="lg" variant="outline" className="neon-border">
+              <Button size="lg" variant="outline" className="inline-flex items-center gap-2 text-base font-medium neon-border">
                 <Trophy className="mr-2 w-5 h-5" />
                 Practice Quizzes
               </Button>
@@ -116,7 +120,7 @@ export default function Home() {
                   </div>
                 </div>
                 <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
-                <p className="text-muted-foreground">{feature.description}</p>
+                <p className="text-muted-foreground leading-relaxed">{feature.description}</p>
               </Card>
             ))}
           </div>
@@ -131,11 +135,13 @@ export default function Home() {
               <Card className="p-8 gradient-card border-border/50 hover:border-primary/50 transition-all duration-300 hover:scale-105 h-full">
                 <BookOpen className="w-12 h-12 text-primary mb-4 group-hover:animate-pulse-glow" />
                 <h3 className="text-2xl font-bold mb-2">Learn Topics</h3>
-                <p className="text-muted-foreground mb-4">
+                <p className="text-muted-foreground mb-4 leading-relaxed">
                   Explore all topics with animations, notes, and memory tricks
                 </p>
-                <span className="text-primary font-medium inline-flex items-center">
-                  Start Learning <ArrowRight className="ml-2 w-4 h-4" />
+                {/* Use inline-flex on the text span so icon and label align perfectly */}
+                <span className="text-primary font-medium inline-flex items-center gap-2">
+                  <span>Start Learning</span>
+                  <ArrowRight className="w-4 h-4" />
                 </span>
               </Card>
             </Link>
@@ -144,11 +150,12 @@ export default function Home() {
               <Card className="p-8 gradient-card border-border/50 hover:border-secondary/50 transition-all duration-300 hover:scale-105 h-full">
                 <Target className="w-12 h-12 text-secondary mb-4 group-hover:animate-pulse-glow" />
                 <h3 className="text-2xl font-bold mb-2">Track Progress</h3>
-                <p className="text-muted-foreground mb-4">
+                <p className="text-muted-foreground mb-4 leading-relaxed">
                   Monitor your learning journey and earn achievement badges
                 </p>
-                <span className="text-secondary font-medium inline-flex items-center">
-                  View Dashboard <ArrowRight className="ml-2 w-4 h-4" />
+                <span className="text-secondary font-medium inline-flex items-center gap-2">
+                  <span>View Dashboard</span>
+                  <ArrowRight className="w-4 h-4" />
                 </span>
               </Card>
             </Link>
@@ -157,11 +164,12 @@ export default function Home() {
               <Card className="p-8 gradient-card border-border/50 hover:border-accent/50 transition-all duration-300 hover:scale-105 h-full">
                 <Trophy className="w-12 h-12 text-accent mb-4 group-hover:animate-pulse-glow" />
                 <h3 className="text-2xl font-bold mb-2">Take Quizzes</h3>
-                <p className="text-muted-foreground mb-4">
+                <p className="text-muted-foreground mb-4 leading-relaxed">
                   Test your knowledge and earn badges with fun challenges
                 </p>
-                <span className="text-accent font-medium inline-flex items-center">
-                  Start Quiz <ArrowRight className="ml-2 w-4 h-4" />
+                <span className="text-accent font-medium inline-flex items-center gap-2">
+                  <span>Start Quiz</span>
+                  <ArrowRight className="w-4 h-4" />
                 </span>
               </Card>
             </Link>
