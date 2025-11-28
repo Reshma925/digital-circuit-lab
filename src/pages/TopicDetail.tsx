@@ -4,26 +4,40 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  ArrowLeft, 
-  BookOpen, 
-  CheckCircle2, 
+import {
+  ArrowLeft,
+  BookOpen,
+  CheckCircle2,
   Lightbulb,
   Calculator,
   Award,
-  ChevronRight
+  ChevronRight,
+  Power,
 } from "lucide-react";
 import { allTopicsData } from "@/data/allTopicsData";
-import ReactMarkdown from 'react-markdown';
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+
+/**
+ * Final consolidated TopicDetail.tsx
+ * - Based on the working version you provided.
+ * - Adds an inline Interactive Gates implementation inside the "Interactive" tab,
+ *   but does NOT require any extra files or components.
+ * - Paste this entire file replacing your current `src/pages/TopicDetail.tsx`.
+ */
 
 export default function TopicDetail() {
   const { topicId } = useParams();
-  const topic = allTopicsData.find(t => t.id === topicId);
-  
+  const topic = allTopicsData.find((t) => t.id === topicId);
+
   const [selectedLesson, setSelectedLesson] = useState(0);
-  const [practiceAnswers, setPracticeAnswers] = useState<{[key: string]: number}>({});
-  const [showHints, setShowHints] = useState<{[key: string]: boolean}>({});
-  const [submitted, setSubmitted] = useState<{[key: string]: boolean}>({});
+  const [practiceAnswers, setPracticeAnswers] = useState<{ [k: string]: number }>({});
+  const [showHints, setShowHints] = useState<{ [k: string]: boolean }>({});
+  const [submitted, setSubmitted] = useState<{ [k: string]: boolean }>({});
+  const [selectedGateIndex, setSelectedGateIndex] = useState(0);
+
+  // gate inputs stored as numbers (0 or 1). default for binary [0,0], for unary [0]
+  const [gateInputs, setGateInputs] = useState<number[]>([0, 0]);
 
   if (!topic) {
     return (
@@ -53,6 +67,53 @@ export default function TopicDetail() {
     setShowHints({ ...showHints, [questionId]: !showHints[questionId] });
   };
 
+  /* ----------------- Inline Interactive Gate Logic ----------------- */
+  const logicEval = (type: string, inputs: number[]) => {
+    const A = inputs[0] ?? 0;
+    const B = inputs[1] ?? 0;
+    switch ((type || "").toUpperCase()) {
+      case "AND":
+        return A && B ? 1 : 0;
+      case "OR":
+        return A || B ? 1 : 0;
+      case "NOT":
+        return A ? 0 : 1;
+      case "NAND":
+        return A && B ? 0 : 1;
+      case "NOR":
+        return A || B ? 0 : 1;
+      case "XOR":
+        return (A ^ B) ? 1 : 0;
+      case "XNOR":
+        return (A ^ B) ? 0 : 1;
+      default:
+        return 0;
+    }
+  };
+
+  const getTruthRows = (type: string, inputsCount: number) => {
+    if (inputsCount === 1) {
+      return [
+        { A: 0, Y: logicEval(type, [0]) },
+        { A: 1, Y: logicEval(type, [1]) },
+      ];
+    }
+    // binary
+    return [
+      { A: 0, B: 0, Y: logicEval(type, [0, 0]) },
+      { A: 0, B: 1, Y: logicEval(type, [0, 1]) },
+      { A: 1, B: 0, Y: logicEval(type, [1, 0]) },
+      { A: 1, B: 1, Y: logicEval(type, [1, 1]) },
+    ];
+  };
+
+  // ensure selectedGateIndex valid
+  const truthTables = (currentLesson as any).truthTables as { type: string; inputs: number }[] | undefined;
+  const selectedGate = truthTables && truthTables.length > 0 ? truthTables[selectedGateIndex] : undefined;
+  const gateOutput = selectedGate ? logicEval(selectedGate.type, gateInputs) : 0;
+
+  /* ----------------- UI ----------------- */
+
   return (
     <div className="min-h-screen pt-24 pb-16 px-4">
       <div className="container mx-auto max-w-7xl">
@@ -64,7 +125,7 @@ export default function TopicDetail() {
               Back to Topics
             </Button>
           </Link>
-          
+
           <div className="flex items-start justify-between mb-4">
             <div>
               <h1 className="text-4xl font-bold mb-2 text-glow">{topic.title}</h1>
@@ -93,7 +154,7 @@ export default function TopicDetail() {
         </div>
 
         <div className="grid lg:grid-cols-4 gap-6">
-          {/* Sidebar - Lessons List */}
+          {/* Sidebar */}
           <Card className="lg:col-span-1 p-4 gradient-card border-border/50 h-fit">
             <h3 className="font-bold mb-4 flex items-center">
               <BookOpen className="w-4 h-4 mr-2" />
@@ -103,20 +164,17 @@ export default function TopicDetail() {
               {topic.lessons.map((lesson, index) => (
                 <button
                   key={lesson.id}
-                  onClick={() => setSelectedLesson(index)}
-                  className={`w-full text-left p-3 rounded-lg transition-all ${
-                    selectedLesson === index
-                      ? 'bg-primary/20 border border-primary/50 text-primary'
-                      : 'hover:bg-muted border border-transparent'
-                  }`}
+                  onClick={() => {
+                    setSelectedLesson(index);
+                    // reset interactive state when switching lessons
+                    setSelectedGateIndex(0);
+                    setGateInputs([0, 0]);
+                  }}
+                  className={`w-full text-left p-3 rounded-lg transition-all ${selectedLesson === index ? 'bg-primary/20 border border-primary/50 text-primary' : 'hover:bg-muted border border-transparent'}`}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">
-                      {index + 1}. {lesson.title}
-                    </span>
-                    {selectedLesson === index && (
-                      <ChevronRight className="w-4 h-4" />
-                    )}
+                    <span className="text-sm font-medium">{index + 1}. {lesson.title}</span>
+                    {selectedLesson === index && <ChevronRight className="w-4 h-4" />}
                   </div>
                 </button>
               ))}
@@ -146,11 +204,17 @@ export default function TopicDetail() {
                     <Award className="w-4 h-4 mr-2" />
                     Exam Tips
                   </TabsTrigger>
+                  <TabsTrigger value="interactive">
+                    <Power className="w-4 h-4 mr-2" />
+                    Interactive
+                  </TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="lesson" className="space-y-6">
-                  <div className="prose prose-invert max-w-none">
-                    <ReactMarkdown>{currentLesson.content}</ReactMarkdown>
+                  <div className="prose prose-invert max-w-none text-justify leading-relaxed tracking-wide text-[17px] space-y-4">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                      {currentLesson.content}
+                    </ReactMarkdown>
                   </div>
                 </TabsContent>
 
@@ -177,27 +241,157 @@ export default function TopicDetail() {
                         <Calculator className="w-5 h-5 mr-2" />
                         Formula Box
                       </h3>
-                      <pre className="font-mono bg-muted p-4 rounded-lg overflow-x-auto">
-                        {currentLesson.formula}
-                      </pre>
+                      <pre className="font-mono bg-muted p-4 rounded-lg overflow-x-auto">{currentLesson.formula}</pre>
                     </Card>
                   )}
                 </TabsContent>
 
+                <TabsContent value="interactive" className="space-y-6">
+                  {/* Inline interactive UI — appears only if truthTables exists */}
+                  {!truthTables || truthTables.length === 0 ? (
+                    <p className="text-muted-foreground">No interactive gates in this lesson.</p>
+                  ) : (
+                    <>
+                      {/* Gate selector */}
+                      <div className="flex flex-wrap gap-2 mb-6">
+                        {truthTables.map((g, i) => (
+                          <Button
+                            key={i}
+                            variant={i === selectedGateIndex ? "default" : "outline"}
+                            onClick={() => {
+                              setSelectedGateIndex(i);
+                              // reset inputs appropriately
+                              setGateInputs(g.inputs === 1 ? [0] : [0, 0]);
+                            }}
+                          >
+                            {g.type}
+                          </Button>
+                        ))}
+                      </div>
+
+                      {/* Inputs area */}
+                      <Card className="p-6 bg-muted/10 border-border/20">
+                        {selectedGate?.inputs === 1 ? (
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <h3 className="text-lg font-semibold mb-2">Input A</h3>
+                              <div className="flex gap-2">
+                                {[0, 1].map((bit) => (
+                                  <Button
+                                    key={bit}
+                                    onClick={() => setGateInputs([bit])}
+                                    className={gateInputs[0] === bit ? "bg-accent text-white" : ""}
+                                  >
+                                    {bit}
+                                  </Button>
+                                ))}
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-3">
+                              <span className="font-medium">Output</span>
+                              <div className={`w-8 h-8 rounded-full ${logicEval(selectedGate?.type ?? "", gateInputs) ? "bg-yellow-400 shadow-lg shadow-yellow-500" : "bg-gray-600"}`} />
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-6">
+                              <div>
+                                <h4 className="text-sm font-medium mb-2 text-center">A</h4>
+                                <div className="flex gap-2">
+                                  {[0, 1].map((bit) => (
+                                    <Button
+                                      key={bit}
+                                      onClick={() => setGateInputs([bit, gateInputs[1] ?? 0])}
+                                      className={gateInputs[0] === bit ? "bg-accent text-white" : ""}
+                                    >
+                                      {bit}
+                                    </Button>
+                                  ))}
+                                </div>
+                              </div>
+
+                              <div>
+                                <h4 className="text-sm font-medium mb-2 text-center">B</h4>
+                                <div className="flex gap-2">
+                                  {[0, 1].map((bit) => (
+                                    <Button
+                                      key={bit}
+                                      onClick={() => setGateInputs([gateInputs[0] ?? 0, bit])}
+                                      className={gateInputs[1] === bit ? "bg-accent text-white" : ""}
+                                    >
+                                      {bit}
+                                    </Button>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-3">
+                              <span className="font-medium">Output</span>
+                              <div className={`w-8 h-8 rounded-full ${gateOutput ? "bg-yellow-400 shadow-lg shadow-yellow-500" : "bg-gray-600"}`} />
+                            </div>
+                          </div>
+                        )}
+                      </Card>
+
+                      {/* Truth table */}
+                      <Card className="p-6 mt-6">
+                        <h3 className="text-xl font-bold mb-4">Truth Table — {selectedGate?.type}</h3>
+                        <div className="overflow-x-auto">
+                          <table className="min-w-[320px] w-full table-auto border-collapse text-center">
+                            <thead>
+                              <tr className="bg-muted/10">
+                                {selectedGate?.inputs === 2 ? (
+                                  <>
+                                    <th className="px-3 py-2 border">A</th>
+                                    <th className="px-3 py-2 border">B</th>
+                                    <th className="px-3 py-2 border">Y</th>
+                                  </>
+                                ) : (
+                                  <>
+                                    <th className="px-3 py-2 border">A</th>
+                                    <th className="px-3 py-2 border">Y</th>
+                                  </>
+                                )}
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {getTruthRows(selectedGate!.type, selectedGate!.inputs).map((row: any, idx: number) => (
+                                <tr
+                                  key={idx}
+                                  className="cursor-pointer hover:bg-muted/5"
+                                  onClick={() => {
+                                    if (selectedGate!.inputs === 1) setGateInputs([row.A]);
+                                    else setGateInputs([row.A, row.B]);
+                                  }}
+                                >
+                                  <td className="px-3 py-2 border">{row.A}</td>
+                                  {selectedGate!.inputs === 2 && <td className="px-3 py-2 border">{row.B}</td>}
+                                  <td className="px-3 py-2 border font-mono">{row.Y}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                        <p className="text-sm text-muted-foreground mt-3">Click a row to set inputs.</p>
+                      </Card>
+                    </>
+                  )}
+                </TabsContent>
+
                 <TabsContent value="practice" className="space-y-6">
-                  {currentLesson.practice.map((question, idx) => {
+                  {currentLesson.practice.map((question: any, idx: number) => {
                     const isSubmitted = submitted[question.id];
                     const userAnswer = practiceAnswers[question.id];
                     const isCorrect = userAnswer === question.correctAnswer;
 
                     return (
                       <Card key={question.id} className="p-6 bg-muted/30">
-                        <h3 className="font-bold mb-4">
-                          Question {idx + 1}: {question.question}
-                        </h3>
+                        <h3 className="font-bold mb-4">Question {idx + 1}: {question.question}</h3>
 
                         <div className="space-y-2 mb-4">
-                          {question.options.map((option, optionIdx) => (
+                          {question.options.map((option: string, optionIdx: number) => (
                             <button
                               key={optionIdx}
                               onClick={() => handlePracticeAnswer(question.id, optionIdx)}
@@ -219,9 +413,7 @@ export default function TopicDetail() {
                                   {String.fromCharCode(65 + optionIdx)}
                                 </span>
                                 <span>{option}</span>
-                                {isSubmitted && optionIdx === question.correctAnswer && (
-                                  <CheckCircle2 className="w-5 h-5 ml-auto text-accent" />
-                                )}
+                                {isSubmitted && optionIdx === question.correctAnswer && <CheckCircle2 className="w-5 h-5 ml-auto text-accent" />}
                               </div>
                             </button>
                           ))}
@@ -229,17 +421,11 @@ export default function TopicDetail() {
 
                         <div className="flex gap-2">
                           {!isSubmitted && (
-                            <Button
-                              onClick={() => handleSubmitPractice(question.id)}
-                              disabled={userAnswer === undefined}
-                            >
+                            <Button onClick={() => handleSubmitPractice(question.id)} disabled={userAnswer === undefined}>
                               Submit Answer
                             </Button>
                           )}
-                          <Button
-                            variant="outline"
-                            onClick={() => toggleHint(question.id)}
-                          >
+                          <Button variant="outline" onClick={() => toggleHint(question.id)}>
                             <Lightbulb className="w-4 h-4 mr-2" />
                             {showHints[question.id] ? 'Hide' : 'Show'} Hint
                           </Button>
@@ -253,9 +439,7 @@ export default function TopicDetail() {
 
                         {isSubmitted && (
                           <Card className={`mt-4 p-4 ${isCorrect ? 'bg-accent/10 border-accent/20' : 'bg-destructive/10 border-destructive/20'}`}>
-                            <p className="font-bold mb-2">
-                              {isCorrect ? '✓ Correct!' : '✗ Incorrect'}
-                            </p>
+                            <p className="font-bold mb-2">{isCorrect ? '✓ Correct!' : '✗ Incorrect'}</p>
                             <p className="text-sm">{question.explanation}</p>
                           </Card>
                         )}
