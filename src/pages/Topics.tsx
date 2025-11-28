@@ -1,3 +1,4 @@
+// src/Topics.tsx
 import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -74,7 +75,7 @@ export default function Topics() {
       <div className="container mx-auto">
         <div className="text-center mb-12">
           <h1 className="text-5xl font-bold mb-4 text-glow">Learning Topics</h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             Master Digital Electronics step by step. Each topic includes interactive lessons, 
             animations, practice problems, and memory tricks.
           </p>
@@ -103,12 +104,15 @@ export default function Topics() {
               </div>
 
               <h3 className="text-2xl font-bold mb-2">{topic.title}</h3>
-              <p className="text-muted-foreground mb-4">{topic.description}</p>
+              <p className="text-muted-foreground mb-4 leading-relaxed">{topic.description}</p>
 
               <Link to={`/topics/${topic.id}`}>
-                <Button className="w-full bg-primary/20 hover:bg-primary text-primary hover:text-primary-foreground border border-primary/50">
-                  Start Learning
-                  <ArrowRight className="ml-2 w-4 h-4" />
+                {/* Ensure button content is perfectly centered and the icon aligns */}
+                <Button
+                  className="w-full inline-flex items-center justify-center gap-2 text-base font-medium bg-primary/20 hover:bg-primary text-primary hover:text-primary-foreground border border-primary/50"
+                >
+                  <span>Start Learning</span>
+                  <ArrowRight className="w-4 h-4" />
                 </Button>
               </Link>
             </Card>
